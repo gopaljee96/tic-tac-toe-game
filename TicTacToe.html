@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tic Tac Toe By Gopal Jee </title>
+<style>
+    body {
+        font-family: 'Segoe UI', sans-serif;
+        background: linear-gradient(135deg, #74ABE2, #5563DE);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        flex-direction: column;
+        color: white;
+    }
+    h1 {
+        margin-bottom: 10px;
+        text-shadow: 1px 1px 3px #333;
+    }
+    .scoreboard {
+        display: flex;
+        gap: 20px;
+        font-size: 1.2rem;
+        margin-bottom: 15px;
+    }
+    #gameBoard {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(80px, 100px));
+        grid-template-rows: repeat(3, minmax(80px, 100px));
+        gap: 5px;
+    }
+    .cell {
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 10px;
+        font-size: 2.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        color: #333;
+        transition: transform 0.2s ease, background 0.3s ease;
+    }
+    .cell:hover {
+        background: #fffae6;
+        transform: scale(1.05);
+    }
+    .cell.taken {
+        cursor: not-allowed;
+    }
+    #status {
+        margin-top: 15px;
+        font-size: 1.2rem;
+        font-weight: bold;
+    }
+    #resetBtn {
+        margin-top: 12px;
+        padding: 8px 16px;
+        background: #ff9800;
+        border: none;
+        color: white;
+        font-size: 1rem;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background 0.3s ease;
+    }
+    #resetBtn:hover {
+        background: #e68900;
+    }
+    @media (max-width: 500px) {
+        #gameBoard {
+            grid-template-columns: repeat(3, 80px);
+            grid-template-rows: repeat(3, 80px);
+        }
+        .cell {
+            font-size: 2rem;
+        }
+    }
+</style>
+</head>
+<body>
+
+<h1>Tic Tac Toe</h1>
+<div class="scoreboard">
+    <div>Player X: <span id="scoreX">0</span></div>
+    <div>Player O: <span id="scoreO">0</span></div>
+</div>
+<div id="gameBoard"></div>
+<div id="status">Player X's Turn</div>
+<button id="resetBtn">Restart Game</button>
+
+<script>
+    
+    const gameBoard = document.getElementById("gameBoard");
+    const statusText = document.getElementById("status");
+    const resetBtn = document.getElementById("resetBtn");
+    const scoreXText = document.getElementById("scoreX");
+    const scoreOText = document.getElementById("scoreO");
+
+    let currentPlayer = "X";
+    let board = ["", "", "", "", "", "", "", "", ""];
+    let gameActive = true;
+    let scoreX = 0, scoreO = 0;
+
+    const winPatterns = [
+        [0,1,2],[3,4,5],[6,7,8],
+        [0,3,6],[1,4,7],[2,5,8],
+        [0,4,8],[2,4,6]
+    ];
+
+    function createBoard() {
+        gameBoard.innerHTML = "";
+        for (let i = 0; i < 9; i++) {
+            const cell = document.createElement("div");
+            cell.classList.add("cell");
+            cell.setAttribute("data-index", i);
+            cell.addEventListener("click", handleMove);
+            gameBoard.appendChild(cell);
+        }
+    }
+
+    function handleMove() {
+        const index = this.getAttribute("data-index");
+        if (board[index] !== "" || !gameActive) return;
+
+        board[index] = currentPlayer;
+        this.textContent = currentPlayer;
+        this.classList.add("taken");
+
+        if (checkWinner()) {
+            statusText.textContent = `🎉 Player ${currentPlayer} Wins!`;
+            updateScore();
+            gameActive = false;
+        } else if (board.every(cell => cell !== "")) {
+            statusText.textContent = "🤝 It's a Draw!";
+            gameActive = false;
+        } else {
+            currentPlayer = currentPlayer === "X" ? "O" : "X";
+            statusText.textContent = `Player ${currentPlayer}'s Turn`;
+        }
+    }
+
+
+    function checkWinner() {
+        return winPatterns.some(pattern => {
+            return pattern.every(index => board[index] === currentPlayer);
+        });
+    }
+
+    function updateScore() {
+        if (currentPlayer === "X") {
+            scoreX++;
+            scoreXText.textContent = scoreX;
+        } else {
+            scoreO++;
+            scoreOText.textContent = scoreO;
+        }
+    }
+
+  
+    function resetGame() {
+        currentPlayer = "X";
+        board = ["", "", "", "", "", "", "", "", ""];
+        gameActive = true;
+        statusText.textContent = "Player X's Turn";
+        createBoard();
+    }
+
+ 
+    resetBtn.addEventListener("click", resetGame);
+
+    createBoard();
+</script>
+
+</body>
+</html>
